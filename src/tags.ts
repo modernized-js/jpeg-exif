@@ -139,3 +139,6 @@ const tags = {
   },
 } as const;
 export default tags;
+
+export type IfdTagName = (typeof tags.ifd)[keyof typeof tags.ifd];
+export type GpsTagName = (typeof tags.gps)[keyof typeof tags.gps];
