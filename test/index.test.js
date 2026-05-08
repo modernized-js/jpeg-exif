@@ -10,7 +10,7 @@ const parseAsync = (file) =>
 
 describe('.parse()', () => {
   it('file {undefined}', async () => {
-    await assert.rejects(parseAsync(undefined), Error);
+    await assert.rejects(parseAsync(), Error);
   });
 
   it('file {null}', async () => {

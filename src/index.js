@@ -18,12 +18,12 @@ const tags = require('./tags.json');
  */
 const bytes = [0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8];
 const SOIMarkerLength = 2;
-const JPEGSOIMarker = 0xffd8;
-const TIFFINTEL = 0x4949;
-const TIFFMOTOROLA = 0x4d4d;
+const JPEGSOIMarker = 0xff_d8;
+const TIFFINTEL = 0x49_49;
+const TIFFMOTOROLA = 0x4d_4d;
 const APPMarkerLength = 2;
-const APPMarkerBegin = 0xffe0;
-const APPMarkerEnd = 0xffef;
+const APPMarkerBegin = 0xff_e0;
+const APPMarkerEnd = 0xff_ef;
 let data;
 /**
  * @param buffer {Buffer}
@@ -111,7 +111,7 @@ const IFDHandler = (buffer, tagCollection, order, offset) => {
     const dataValueBegin = componentsBegin + componentsNumberLength;
     const dataValueLength = 4;
     const tagAddress = entry.slice(tagBegin, dataFormatBegin);
-    const tagNumber = order ? tagAddress.toString('hex') : tagAddress.reverse().toString('hex');
+    const tagNumber = order ? tagAddress.toString('hex') : tagAddress.toReversed().toString('hex');
     const tagName = tagCollection[tagNumber];
     const bigDataFormat = entry.readUInt16BE(dataFormatBegin);
     const littleDataFormat = entry.readUInt16LE(dataFormatBegin);
@@ -132,19 +132,23 @@ const IFDHandler = (buffer, tagCollection, order, offset) => {
 
     if (tagName) {
       switch (dataFormat) {
-        case 1:
+        case 1: {
           tagValue = dataValue.readUInt8(0);
           break;
-        case 2:
+        }
+        case 2: {
           tagValue = dataValue.toString('ascii').replace(/\0+$/, '');
           break;
-        case 3:
+        }
+        case 3: {
           tagValue = order ? dataValue.readUInt16BE(0) : dataValue.readUInt16LE(0);
           break;
-        case 4:
+        }
+        case 4: {
           tagValue = order ? dataValue.readUInt32BE(0) : dataValue.readUInt32LE(0);
           break;
-        case 5:
+        }
+        case 5: {
           tagValue = [];
 
           for (let i = 0; i < dataValue.length; i += 8) {
@@ -154,31 +158,38 @@ const IFDHandler = (buffer, tagCollection, order, offset) => {
           }
 
           break;
-        case 7:
+        }
+        case 7: {
           switch (tagName) {
-            case 'ExifVersion':
+            case 'ExifVersion': {
               tagValue = dataValue.toString();
               break;
-            case 'FlashPixVersion':
+            }
+            case 'FlashPixVersion': {
               tagValue = dataValue.toString();
               break;
-            case 'SceneType':
+            }
+            case 'SceneType': {
               tagValue = dataValue.readUInt8(0);
               break;
-            default:
+            }
+            default: {
               tagValue = `0x${dataValue.toString('hex', 0, 15)}`;
               break;
+            }
           }
           break;
+        }
         case 10: {
           const bigOrder = dataValue.readInt32BE(0) / dataValue.readInt32BE(4);
           const littleOrder = dataValue.readInt32LE(0) / dataValue.readInt32LE(4);
           tagValue = order ? bigOrder : littleOrder;
           break;
         }
-        default:
+        default: {
           tagValue = `0x${dataValue.toString('hex')}`;
           break;
+        }
       }
       exif[tagName] = tagValue;
     }
@@ -254,12 +265,15 @@ const APPnHandler = (buffer) => {
     const length = buffer.readUInt16BE(APPMarkerLength);
 
     switch (APPMarkerTag) {
-      case 1: // EXIF
+      case 1: {
+        // EXIF
         EXIFHandler(buffer);
         break;
-      default:
+      }
+      default: {
         APPnHandler(buffer.slice(APPMarkerLength + length));
         break;
+      }
     }
   }
 };
@@ -277,9 +291,9 @@ const fromBuffer = (buffer) => {
   data = undefined;
 
   if (isValid(buffer)) {
-    buffer = buffer.slice(SOIMarkerLength);
+    const trimmed = buffer.slice(SOIMarkerLength);
     data = {};
-    APPnHandler(buffer);
+    APPnHandler(trimmed);
   } else if (isTiff(buffer)) {
     data = {};
     EXIFHandler(buffer, false);
@@ -321,48 +335,37 @@ const sync = (file) => {
 const async = (file, callback) => {
   data = undefined;
 
-  new Promise(
-    (resolve, reject) => {
-      if (!file) {
-        reject(new Error('❓File not found.'));
+  new Promise((resolve, reject) => {
+    if (!file) {
+      reject(new Error('❓File not found.'));
+      return;
+    }
+
+    fs.readFile(file, (err, buffer) => {
+      if (err) {
+        reject(err);
+        return;
       }
-
-      fs.readFile(file, (err, buffer) => {
-        if (err) {
-          reject(err);
+      try {
+        if (isValid(buffer)) {
+          const buf = buffer.slice(SOIMarkerLength);
+          data = {};
+          APPnHandler(buf);
+          resolve(data);
+        } else if (isTiff(buffer)) {
+          data = {};
+          EXIFHandler(buffer, false);
+          resolve(data);
         } else {
-          try {
-            if (isValid(buffer)) {
-              const buf = buffer.slice(SOIMarkerLength);
-
-              data = {};
-
-              APPnHandler(buf);
-              resolve(data);
-            } else if (isTiff(buffer)) {
-              data = {};
-
-              EXIFHandler(buffer, false);
-              resolve(data);
-            } else {
-              reject(new Error('😱Unsupport file type.'));
-            }
-          } catch (e) {
-            reject(e);
-          }
+          reject(new Error('😱Unsupport file type.'));
         }
-      });
-    },
-    (error) => {
-      callback(error, undefined);
-    },
-  )
-    .then((d) => {
-      callback(undefined, d);
-    })
-    .catch((error) => {
-      callback(error, undefined);
+      } catch (cause) {
+        reject(cause);
+      }
     });
+  })
+    .then((d) => callback(undefined, d))
+    .catch((error) => callback(error));
 };
 
 exports.fromBuffer = fromBuffer;
