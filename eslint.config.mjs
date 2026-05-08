@@ -22,9 +22,9 @@ export default [
       },
     },
     rules: {
-      complexity: ['error', { max: 25 }],
-      'max-lines-per-function': ['error', { max: 150, skipBlankLines: true, skipComments: true }],
-      'max-depth': ['error', 5],
+      complexity: ['error', { max: 15 }],
+      'max-lines-per-function': ['error', { max: 50, skipBlankLines: true, skipComments: true }],
+      'max-depth': ['error', 4],
       'max-params': ['error', 4],
       'no-param-reassign': ['error', { props: false }],
       eqeqeq: ['error', 'always'],
