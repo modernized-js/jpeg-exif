@@ -1,0 +1,7 @@
+node_modules
+coverage
+dist
+yarn.lock
+*.min.js
+src/plus.json
+src/tags.json

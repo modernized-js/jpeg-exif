@@ -1,4 +1,4 @@
-import fs from 'fs';
+const fs = require('node:fs');
 
 const tags = require('./tags.json');
 
@@ -37,8 +37,8 @@ const isValid = (buffer) => {
   try {
     const SOIMarker = buffer.readUInt16BE(0);
     return SOIMarker === JPEGSOIMarker;
-  } catch (e) {
-    throw new Error('Unsupport file format.');
+  } catch (cause) {
+    throw new Error('Unsupport file format.', { cause });
   }
 };
 /**
@@ -50,8 +50,8 @@ const isTiff = (buffer) => {
   try {
     const SOIMarker = buffer.readUInt16BE(0);
     return SOIMarker === TIFFINTEL || SOIMarker === TIFFMOTOROLA;
-  } catch (e) {
-    throw new Error('Unsupport file format.');
+  } catch (cause) {
+    throw new Error('Unsupport file format.', { cause });
   }
 };
 /**
@@ -67,8 +67,8 @@ const checkAPPn = (buffer) => {
     const APPMarkerTag = buffer.readUInt16BE(0);
     const isInRange = APPMarkerTag >= APPMarkerBegin && APPMarkerTag <= APPMarkerEnd;
     return isInRange ? APPMarkerTag - APPMarkerBegin : false;
-  } catch (e) {
-    throw new Error('Invalid APP Tag.');
+  } catch (cause) {
+    throw new Error('Invalid APP Tag.', { cause });
   }
 };
 /**
@@ -249,7 +249,8 @@ const EXIFHandler = (buf, pad = true) => {
 const APPnHandler = (buffer) => {
   const APPMarkerTag = checkAPPn(buffer);
 
-  if (APPMarkerTag !== false) { // APP0 is 0, and 0==false
+  if (APPMarkerTag !== false) {
+    // APP0 is 0, and 0==false
     const length = buffer.readUInt16BE(APPMarkerLength);
 
     switch (APPMarkerTag) {
@@ -320,43 +321,48 @@ const sync = (file) => {
 const async = (file, callback) => {
   data = undefined;
 
-  new Promise((resolve, reject) => {
-    if (!file) {
-      reject(new Error('❓File not found.'));
-    }
-
-    fs.readFile(file, (err, buffer) => {
-      if (err) {
-        reject(err);
-      } else {
-        try {
-          if (isValid(buffer)) {
-            const buf = buffer.slice(SOIMarkerLength);
-
-            data = {};
-
-            APPnHandler(buf);
-            resolve(data);
-          } else if (isTiff(buffer)) {
-            data = {};
-
-            EXIFHandler(buffer, false);
-            resolve(data);
-          } else {
-            reject(new Error('😱Unsupport file type.'));
-          }
-        } catch (e) {
-          reject(e);
-        }
+  new Promise(
+    (resolve, reject) => {
+      if (!file) {
+        reject(new Error('❓File not found.'));
       }
+
+      fs.readFile(file, (err, buffer) => {
+        if (err) {
+          reject(err);
+        } else {
+          try {
+            if (isValid(buffer)) {
+              const buf = buffer.slice(SOIMarkerLength);
+
+              data = {};
+
+              APPnHandler(buf);
+              resolve(data);
+            } else if (isTiff(buffer)) {
+              data = {};
+
+              EXIFHandler(buffer, false);
+              resolve(data);
+            } else {
+              reject(new Error('😱Unsupport file type.'));
+            }
+          } catch (e) {
+            reject(e);
+          }
+        }
+      });
+    },
+    (error) => {
+      callback(error, undefined);
+    },
+  )
+    .then((d) => {
+      callback(undefined, d);
+    })
+    .catch((error) => {
+      callback(error, undefined);
     });
-  }, (error) => {
-    callback(error, undefined);
-  }).then((d) => {
-    callback(undefined, d);
-  }).catch((error) => {
-    callback(error, undefined);
-  });
 };
 
 exports.fromBuffer = fromBuffer;
