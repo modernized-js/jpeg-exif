@@ -2,7 +2,30 @@
   "name": "@modernized/jpeg-exif",
   "version": "1.1.4",
   "description": "Get EXIF/TIFF metadata from JPEG and TIFF files. Maintained fork of `jpeg-exif`.",
-  "main": "src/index.js",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/cjs",
+    "dist/esm",
+    "src",
+    "!src/**/*.map",
+    "README.md",
+    "LICENSE.txt"
+  ],
   "engines": {
     "node": ">=22"
   },
@@ -10,8 +33,17 @@
     "lint": "eslint src test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "node --test \"test/**/*.test.js\"",
-    "coverage": "c8 node --test \"test/**/*.test.js\""
+    "typecheck": "tsc --noEmit",
+    "clean": "node -e \"const f=require('node:fs');f.rmSync('dist',{recursive:true,force:true});f.rmSync('dist-test',{recursive:true,force:true})\"",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:shims": "node -e \"const f=require('node:fs');f.writeFileSync('dist/cjs/package.json',JSON.stringify({type:'commonjs'}));f.writeFileSync('dist/esm/package.json',JSON.stringify({type:'module'}))\"",
+    "build": "yarn clean && yarn build:cjs && yarn build:esm && yarn build:shims",
+    "build:test": "tsc -p tsconfig.test.json",
+    "pretest": "yarn build:test",
+    "test": "node --test \"dist-test/test/**/*.test.js\"",
+    "coverage": "node --test --experimental-test-coverage \"dist-test/test/**/*.test.js\"",
+    "prepack": "yarn build"
   },
   "keywords": [
     "jpeg",
@@ -41,12 +73,14 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "c8": "^11.0.0",
+    "@types/node": "^25.6.2",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-promise": "^7.3.0",
     "eslint-plugin-unicorn": "^64.0.0",
     "globals": "^17.6.0",
-    "prettier": "^3.8.3"
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.2"
   }
 }
