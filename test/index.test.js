@@ -1,90 +1,79 @@
-/* global it, describe */
-const fs = require('fs');
-const { expect } = require('chai');
-const exif = require('../lib/index.js');
+const fs = require('node:fs');
+const { describe, it } = require('node:test');
+const assert = require('node:assert/strict');
+const exif = require('../src/index.js');
+
+const parseAsync = (file) =>
+  new Promise((resolve, reject) => {
+    exif.parse(file, (err, data) => (err ? reject(err) : resolve(data)));
+  });
 
 describe('.parse()', () => {
-  it('file {undefined}', () => {
-    exif.parse(undefined, (err) => {
-      expect(err).to.throw(Error);
-    });
+  it('file {undefined}', async () => {
+    await assert.rejects(parseAsync(undefined), Error);
   });
 
-  it('file {null}', () => {
-    exif.parse('./test/null.jpg', (err) => {
-      expect(err).to.throw(Error);
-    });
+  it('file {null}', async () => {
+    await assert.rejects(parseAsync('./test/null.jpg'), Error);
   });
 
-  it('APP1:#0xffe1', (done) => {
-    exif.parse('./test/IMG_0001.JPG', (err, data) => {
-      expect(data).to.be.an('object');
-      done();
-    });
+  it('APP1:#0xffe1', async () => {
+    const data = await parseAsync('./test/IMG_0001.JPG');
+    assert.strictEqual(typeof data, 'object');
   });
 
-  it('APP0:#0xffe0', (done) => {
-    exif.parse('./test/IMG_0003.JPG', (err, data) => {
-      expect(data).to.be.an('undefined');
-      done();
-    });
+  it('APP0:#0xffe0', async () => {
+    const data = await parseAsync('./test/IMG_0003.JPG');
+    assert.strictEqual(typeof data, 'object');
   });
 
-  it('!(APP1:#0xffe1||APP0:#0xffe0)', (done) => {
-    exif.parse('./test/index.test.js', (err, data) => {
-      expect(data).to.be.an('undefined');
-      done();
-    });
+  it('!(APP1:#0xffe1||APP0:#0xffe0)', async () => {
+    await assert.rejects(parseAsync('./test/index.test.js'), Error);
   });
 
-  it('[SubExif]', (done) => {
-    exif.parse('./test/IMG_0001.JPG', (err, data) => {
-      expect(data.SubExif).to.be.an('object');
-      done();
-    });
+  it('[SubExif]', async () => {
+    const data = await parseAsync('./test/IMG_0001.JPG');
+    assert.strictEqual(typeof data.SubExif, 'object');
   });
 
-  it('[GPSInfo]', (done) => {
-    exif.parse('./test/IMG_0001.JPG', (err, data) => {
-      expect(data.GPSInfo).to.be.an('object');
-      done();
-    });
+  it('[GPSInfo]', async () => {
+    const data = await parseAsync('./test/IMG_0001.JPG');
+    assert.strictEqual(typeof data.GPSInfo, 'object');
   });
 });
 
 describe('.parseSync()', () => {
   it('file {undefined}', () => {
-    expect(exif.parseSync).to.throw(Error);
+    assert.throws(() => exif.parseSync(), Error);
   });
 
   it('file {null}', () => {
-    expect(exif.parseSync).to.throw(Error);
+    assert.throws(() => exif.parseSync(), Error);
   });
 
   it('APP1:#0xffe1', () => {
     const data = exif.parseSync('./test/IMG_0001.JPG');
-    expect(data).to.be.an('object');
+    assert.strictEqual(typeof data, 'object');
   });
 
   it('!APP1:#0xffe1', () => {
     const data = exif.parseSync('./test/IMG_0003.JPG');
-    expect(data).to.be.an('object');
+    assert.strictEqual(typeof data, 'object');
   });
 
   it('[SubExif]', () => {
     const data = exif.parseSync('./test/IMG_0001.JPG');
-    expect(data.SubExif).to.be.an('object');
+    assert.strictEqual(typeof data.SubExif, 'object');
   });
 
   it('[GPSInfo]', () => {
     const data = exif.parseSync('./test/IMG_0001.JPG');
-    expect(data.GPSInfo).to.be.an('object');
+    assert.strictEqual(typeof data.GPSInfo, 'object');
   });
 
   it('TIFF', () => {
     const data = exif.parseSync('./test/Arbitro.tiff');
-
-    expect(data).to.be.eql({
+    assert.deepStrictEqual(data, {
       ImageWidth: 174,
       ImageHeight: 38,
       BitsPerSample: 8,
@@ -102,34 +91,30 @@ describe('.parseSync()', () => {
 
 describe('.fromBuffer()', () => {
   it('file {undefined}', () => {
-    expect(exif.fromBuffer).to.throw(Error);
+    assert.throws(() => exif.fromBuffer(), Error);
   });
 
   it('APP1:#0xffe1', () => {
     const buffer = fs.readFileSync('./test/IMG_0001.JPG');
     const data = exif.fromBuffer(buffer);
-
-    expect(data).to.be.an('object');
+    assert.strictEqual(typeof data, 'object');
   });
 
   it('!APP1:#0xffe1', () => {
     const buffer = fs.readFileSync('./test/IMG_0003.JPG');
     const data = exif.fromBuffer(buffer);
-
-    expect(data).to.be.an('object');
+    assert.strictEqual(typeof data, 'object');
   });
 
   it('[SubExif]', () => {
     const buffer = fs.readFileSync('./test/IMG_0001.JPG');
     const data = exif.fromBuffer(buffer);
-
-    expect(data.SubExif).to.be.an('object');
+    assert.strictEqual(typeof data.SubExif, 'object');
   });
 
   it('[GPSInfo]', () => {
     const buffer = fs.readFileSync('./test/IMG_0001.JPG');
     const data = exif.fromBuffer(buffer);
-
-    expect(data.GPSInfo).to.be.an('object');
+    assert.strictEqual(typeof data.GPSInfo, 'object');
   });
 });

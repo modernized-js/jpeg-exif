@@ -1,12 +1,17 @@
 {
-  "name": "jpeg-exif",
+  "name": "@modernized/jpeg-exif",
   "version": "1.1.4",
-  "description": "Use for parse .jpg file exif info (including GPS info.).",
-  "main": "lib/index.js",
+  "description": "Get EXIF/TIFF metadata from JPEG and TIFF files. Maintained fork of `jpeg-exif`.",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
-    "test": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "lint": "./node_modules/.bin/eslint ./src/index.js ./test/index.test.js",
-    "build": "babel ./src -d lib --source-maps && cp ./src/*.json ./lib"
+    "lint": "eslint src test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "node --test \"test/**/*.test.js\"",
+    "coverage": "c8 node --test \"test/**/*.test.js\""
   },
   "keywords": [
     "jpeg",
@@ -15,28 +20,31 @@
     "image",
     "picture",
     "photo",
-    "jfif"
+    "jfif",
+    "tiff"
   ],
-  "homepage": "https://github.com/zhso/jpeg-exif",
+  "homepage": "https://github.com/isamu/jpeg-exif",
   "repository": {
     "type": "git",
-    "url": "https://github.com/zhso/jpeg-exif.git"
+    "url": "https://github.com/isamu/jpeg-exif.git"
   },
   "bugs": {
-    "url": "https://github.com/zhso/jpeg-exif/issues",
-    "email": "s@zhso.net"
+    "url": "https://github.com/isamu/jpeg-exif/issues"
   },
-  "author": "s@zhso.net",
+  "author": "isamu",
+  "contributors": [
+    "zhso <s@zhso.net> (original author)"
+  ],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "chai": "^4.2.0",
-    "coveralls": "^3.0.6",
-    "eslint": "^6.2.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.18.2",
-    "istanbul": "^0.4.5",
-    "mocha": "^6.2.0"
+    "@eslint/js": "^10.0.1",
+    "c8": "^11.0.0",
+    "eslint": "^10.3.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.6.0",
+    "prettier": "^3.8.3"
   }
 }

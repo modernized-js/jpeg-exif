@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  lint-and-build:
+  checks:
     name: Node ${{ matrix.node-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -25,12 +25,16 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
+          cache: yarn
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Lint
         run: yarn lint
 
-      - name: Build
-        run: yarn build
+      - name: Format check
+        run: yarn format:check
+
+      - name: Test
+        run: yarn test
