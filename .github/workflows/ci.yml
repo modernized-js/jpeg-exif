@@ -36,5 +36,11 @@ jobs:
       - name: Format check
         run: yarn format:check
 
+      - name: Typecheck
+        run: yarn typecheck
+
+      - name: Build
+        run: yarn build
+
       - name: Test
         run: yarn test

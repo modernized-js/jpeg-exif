@@ -4,7 +4,7 @@ Get exif information from JPEG files. Works with TIFF too.
 
 > **Fork notice.** This is a maintained fork of [`jpeg-exif`](https://www.npmjs.com/package/jpeg-exif) ([zhso/jpeg-exif](https://github.com/zhso/jpeg-exif)), which is deprecated on npm and whose GitHub repository has been removed. The public API (`parse`, `parseSync`, `fromBuffer`) is **fully compatible** — you should be able to swap `jpeg-exif` for `@modernized/jpeg-exif` without any code changes.
 >
-> What's new in the fork: modern toolchain (Node ≥ 22, `node:test`, ESLint 9, Prettier), CI on Linux / macOS / Windows × Node 22 / 24, and ongoing modernization (TypeScript migration and a Promise-returning `parse` are planned).
+> What's new in the fork: TypeScript source with bundled `.d.ts`, dual ESM + CJS publish, a Promise-returning `parsePromise()`, modern toolchain (Node ≥ 22, `node:test`, ESLint 10, Prettier), and CI on Linux / macOS / Windows × Node 22 / 24.
 
 ## Installation
 
@@ -30,6 +30,17 @@ exif.parse(filePath, (err, data) => {
     console.log(data);
   }
 });
+```
+
+### Async (Promise)
+
+```js
+import { parsePromise } from '@modernized/jpeg-exif';
+
+const filePath = '~/Photo/IMG_0001.JPG';
+const data = await parsePromise(filePath);
+
+console.log(data);
 ```
 
 ### Sync
