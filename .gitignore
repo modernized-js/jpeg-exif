@@ -3,5 +3,6 @@ coverage/
 dist/
 dist-test/
 .DS_Store
+.claude/
 *.log
 *~

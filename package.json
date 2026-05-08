@@ -43,6 +43,8 @@
     "pretest": "yarn build:test",
     "test": "node --test \"dist-test/test/**/*.test.js\"",
     "coverage": "node --test --experimental-test-coverage \"dist-test/test/**/*.test.js\"",
+    "precoverage:check": "yarn build:test",
+    "coverage:check": "node --test --experimental-test-coverage --test-coverage-lines=90 --test-coverage-branches=70 --test-coverage-functions=90 \"dist-test/test/**/*.test.js\"",
     "prepack": "yarn build"
   },
   "keywords": [
