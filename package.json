@@ -57,13 +57,13 @@
     "jfif",
     "tiff"
   ],
-  "homepage": "https://github.com/isamu/jpeg-exif",
+  "homepage": "https://github.com/modernized-js/jpeg-exif",
   "repository": {
     "type": "git",
-    "url": "https://github.com/isamu/jpeg-exif.git"
+    "url": "https://github.com/modernized-js/jpeg-exif.git"
   },
   "bugs": {
-    "url": "https://github.com/isamu/jpeg-exif/issues"
+    "url": "https://github.com/modernized-js/jpeg-exif/issues"
   },
   "author": "isamu",
   "contributors": [
