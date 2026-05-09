@@ -1,5 +1,11 @@
 # @modernized/jpeg-exif
 
+[![npm version](https://img.shields.io/npm/v/@modernized/jpeg-exif.svg)](https://www.npmjs.com/package/@modernized/jpeg-exif)
+[![npm downloads](https://img.shields.io/npm/dm/@modernized/jpeg-exif.svg)](https://www.npmjs.com/package/@modernized/jpeg-exif)
+[![License: MIT](https://img.shields.io/npm/l/@modernized/jpeg-exif.svg)](LICENSE.txt)
+[![CI](https://github.com/modernized-js/jpeg-exif/actions/workflows/ci.yml/badge.svg)](https://github.com/modernized-js/jpeg-exif/actions/workflows/ci.yml)
+[![GitHub stars](https://img.shields.io/github/stars/modernized-js/jpeg-exif.svg?style=social)](https://github.com/modernized-js/jpeg-exif/stargazers)
+
 Get exif information from JPEG files. Works with TIFF too.
 
 > **Fork notice.** This is a maintained fork of [`jpeg-exif`](https://www.npmjs.com/package/jpeg-exif) ([zhso/jpeg-exif](https://github.com/zhso/jpeg-exif)), which is deprecated on npm and whose GitHub repository has been removed. The public API (`parse`, `parseSync`, `fromBuffer`) is **fully compatible** — you should be able to swap `jpeg-exif` for `@modernized/jpeg-exif` without any code changes. Maintained at [modernized-js/jpeg-exif](https://github.com/modernized-js/jpeg-exif).
