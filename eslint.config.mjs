@@ -11,7 +11,7 @@ export default [
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
-  unicorn.configs['flat/recommended'],
+  unicorn.configs.recommended,
   promise.configs['flat/recommended'],
   {
     languageOptions: {
@@ -44,6 +44,8 @@ export default [
       // The `parse` function deliberately converts a Promise chain back to a Node-style
       // callback API; calling the callback inside .then/.catch is the entire point.
       'promise/no-callback-in-promise': 'off',
+      // Same reason: rewriting that chain with `await` would only re-express the Promise-to-callback bridge.
+      'unicorn/prefer-await': 'off',
     },
   },
   prettier,
