@@ -8,5 +8,5 @@ export type ExifData = {
   SubExif?: ExifData;
   GPSInfo?: ExifData;
 };
-export type ParseCallback = (err: Error | undefined, data?: ExifData) => void;
+export type ParseCallback = (error: Error | undefined, data?: ExifData) => void;
 export type TagCollection = Readonly<Record<string, TagName>>;

@@ -6,9 +6,9 @@ import type { ExifData } from '../src/index.js';
 
 const parseAsync = (file: string): Promise<ExifData> =>
   new Promise((resolve, reject) => {
-    exif.parse(file, (err, data) => {
-      if (err) {
-        reject(err);
+    exif.parse(file, (error, data) => {
+      if (error) {
+        reject(error);
         return;
       }
       if (!data) {

@@ -29,9 +29,9 @@ export const parseFile = (file: string): Promise<ExifData> =>
       reject(new Error('❓File not found.'));
       return;
     }
-    fs.readFile(file, (err, buffer) => {
-      if (err) {
-        reject(err);
+    fs.readFile(file, (error, buffer) => {
+      if (error) {
+        reject(error);
         return;
       }
       try {

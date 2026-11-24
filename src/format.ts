@@ -29,8 +29,8 @@ export const isTiff = (buffer: Buffer): boolean => {
 export const checkAPPn = (buffer: Buffer): number | false => {
   try {
     const tag = buffer.readUInt16BE(0);
-    const inRange = tag >= APPMarkerBegin && tag <= APPMarkerEnd;
-    return inRange ? tag - APPMarkerBegin : false;
+    const isInRange = tag >= APPMarkerBegin && tag <= APPMarkerEnd;
+    return isInRange ? tag - APPMarkerBegin : false;
   } catch (cause) {
     throw new Error('Invalid APP Tag.', { cause });
   }
